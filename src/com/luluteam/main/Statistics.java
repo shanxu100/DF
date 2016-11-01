@@ -20,14 +20,13 @@ public class Statistics {
 
 
     //确定窃电用户的数据
-//    private static List<String> QD_NAME = new ArrayList<>();
-//    private static List<String> QD_VALUE = new ArrayList<>();
-    private static Map<String,ArrayList<String>> QD_USER=new HashMap<>();
+    private static Map<String,ArrayList<String>> QD_USER=new HashMap<>();//<用户，用电量>
+    private static Map<String ,HashMap<String,Integer>> QD_USER_MONTH=new HashMap<>(); //<用户，<月份，用电量>>
 
 
     //不确定用户数据
-//    private static List<String> NOT_SURE_VALUE = new ArrayList<>();
-    private static Map<String,ArrayList<String>> NOT_SURE_USER=new HashMap<>();
+    private static Map<String,ArrayList<String>> NOT_SURE_USER=new HashMap<>();//<用户，用电量>
+    private static Map<String ,HashMap<String,Integer>> NOT_SURE_USER_MONTH=new HashMap<>(); //<用户，<月份，用电量>>
 
 
     //flag
@@ -37,44 +36,13 @@ public class Statistics {
     public static void main(String[] args) {
 
         Statistics statistics = new Statistics();
-        StringBuilder sb1=new StringBuilder();
-        sb1.append("CONS_NO;variance;sum\n");
+
 
         ALL_USER_YONGDIAN_DATA_LIST = ReadFromFile.readFileByLines(ALL_USER_YONGDIAN_DATA_FILE);
         TRAIN_LIST = ReadFromFile.readFileByLines(TRAIN_FILE);
         statistics.from_List_to_Map(TRAIN_LIST);
-
         statistics.classifyTrain(ALL_USER_YONGDIAN_DATA_LIST);
 
-        System.out.println("训练集的数量："+TRAIN_LIST.size());
-        System.out.println("窃电用户的数量："+QD_USER.size());
-        System.out.println("不确定用户的数量："+NOT_SURE_USER.size());
-
-        System.out.println("每个窃电用户的数据：");
-        for (String s: QD_USER.keySet())
-        {
-            ArrayList<String> list=QD_USER.get(s);
-            double variance=statistics.countVariance(list);
-            double sum=statistics.countSum(list);
-            //System.out.println("窃电用户："+s +"\t用电记录数："+list.size()+"\t方差："+variance);
-            sb1.append(s+";"+variance+";"+sum+"\n");
-        }
-        WriteToFile.writeToSD("QD_USER",sb1.toString());
-
-
-        StringBuilder sb2=new StringBuilder();
-        sb2.append("CONS_NO;variance;sum\n");
-        System.out.println("每个不确定的用户的数据：");
-        for (String s:NOT_SURE_USER.keySet())
-        {
-            ArrayList<String> list=NOT_SURE_USER.get(s);
-            double variance=statistics.countVariance(list);
-            double sum=statistics.countSum(list);
-
-            //System.out.println("不确定的用户："+s +"\t用电记录数："+list.size()+"\t方差："+variance);
-            sb2.append(s+";"+variance+";"+sum+"\n");
-        }
-        WriteToFile.writeToSD("NOT_SURE_USER",sb2.toString());
 
 
 
@@ -83,6 +51,7 @@ public class Statistics {
 
     /**
      * 把训练集的数据转换成Map存储
+     * 第一遍 遍历训练集，初始化以后用的各种Map
      * @param list
      * @return
      */
@@ -96,8 +65,10 @@ public class Statistics {
             if (tmp[1].equals(QD_FLAG))
             {
                 QD_USER.put(tmp[0],new ArrayList<String>());
+                QD_USER_MONTH.put(tmp[0],new HashMap<String,Integer>());
             }else {
                 NOT_SURE_USER.put(tmp[0],new ArrayList<String>());
+                NOT_SURE_USER_MONTH.put(tmp[0],new HashMap<String,Integer>());
             }
 
         }
@@ -105,7 +76,7 @@ public class Statistics {
     }
 
     /**
-     * 将训练集中的数据进行分类，分别记录窃电用户的用电量和不确定用户的用电量
+     * 将训练集中的数据进行分类，分别记录窃电用户的 “用电量” 和 不确定用户的 “用电量”
      * @param list
      */
     private void classifyTrain(List<String> list) {
@@ -116,8 +87,10 @@ public class Statistics {
 
             if (tmp.length<5)
             {
+                System.out.println("用户信息不全："+s);
                 continue;
             }
+
 
             if (QD_USER.containsKey(tmp[0]))//如果这个用户是“窃电用户”
             {
@@ -133,6 +106,77 @@ public class Statistics {
 
         }
 
+    }
+
+    private void classifyTrain2(List<String> list)
+    {
+        String[] tmp;
+        String[] date;
+        HashMap<String,Integer> map;
+        int firstday=0,lastday=0;
+        for (String s : list) {
+            tmp = s.split(",");
+            date=tmp[1].split("/");
+
+            if (tmp.length<5)
+            {
+                continue;
+            }
+
+            if (QD_USER_MONTH.containsKey(tmp[0]))//如果这个用户是“窃电用户”
+            {
+                map=QD_USER_MONTH.get(tmp[0]);
+
+                continue;
+            }
+
+            if (NOT_SURE_USER_MONTH.containsKey(tmp[0]))
+            {
+                NOT_SURE_USER.get(tmp[0]).add(tmp[4]);
+                continue;
+            }
+
+        }
+
+    }
+
+
+
+    /**
+     * 计算方差的入口
+     */
+    private void statisticVariance()
+    {
+        classifyTrain(ALL_USER_YONGDIAN_DATA_LIST);
+
+        System.out.println("训练集的数量："+TRAIN_LIST.size());
+        System.out.println("窃电用户的数量："+QD_USER.size());
+        System.out.println("不确定用户的数量："+NOT_SURE_USER.size());
+
+        StringBuilder sb1=new StringBuilder();
+        sb1.append("CONS_NO;variance;sum\n");
+        System.out.println("每个窃电用户的数据：");
+        for (String s: QD_USER.keySet())
+        {
+            ArrayList<String> list=QD_USER.get(s);
+            double variance=countVariance(list);
+            double sum=countSum(list);
+            sb1.append(s+";"+variance+";"+sum+"\n");
+        }
+        WriteToFile.writeToSD("QD_USER",sb1.toString());
+
+
+        StringBuilder sb2=new StringBuilder();
+        sb2.append("CONS_NO;variance;sum\n");
+        System.out.println("每个不确定的用户的数据：");
+        for (String s:NOT_SURE_USER.keySet())
+        {
+            ArrayList<String> list=NOT_SURE_USER.get(s);
+            double variance=countVariance(list);
+            double sum=countSum(list);
+            sb2.append(s+";"+variance+";"+sum+"\n");
+        }
+        WriteToFile.writeToSD("NOT_SURE_USER",sb2.toString());
     }
 
     /**
