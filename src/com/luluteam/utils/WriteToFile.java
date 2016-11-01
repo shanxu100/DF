@@ -30,7 +30,9 @@ public class WriteToFile {
             if(!file.exists()) {
                 file.createNewFile();
             }
-            FileOutputStream stream = new FileOutputStream(file, true);
+
+
+            FileOutputStream stream = new FileOutputStream(file, false);
             Writer out = new OutputStreamWriter(stream, "UTF-8");
             //byte[] buf = s.getBytes();
             //stream.write(buf);

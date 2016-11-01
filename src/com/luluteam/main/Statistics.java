@@ -38,7 +38,7 @@ public class Statistics {
 
         Statistics statistics = new Statistics();
         StringBuilder sb1=new StringBuilder();
-        sb1.append("CONS_NO;variance\n");
+        sb1.append("CONS_NO;variance;sum\n");
 
         ALL_USER_YONGDIAN_DATA_LIST = ReadFromFile.readFileByLines(ALL_USER_YONGDIAN_DATA_FILE);
         TRAIN_LIST = ReadFromFile.readFileByLines(TRAIN_FILE);
@@ -55,24 +55,25 @@ public class Statistics {
         {
             ArrayList<String> list=QD_USER.get(s);
             double variance=statistics.countVariance(list);
-            System.out.println("窃电用户："+s +"\t用电记录数："+list.size()+"\t方差："+variance);
-            sb1.append(s+";"+variance+"\n");
+            double sum=statistics.countSum(list);
+            //System.out.println("窃电用户："+s +"\t用电记录数："+list.size()+"\t方差："+variance);
+            sb1.append(s+";"+variance+";"+sum+"\n");
         }
-
         WriteToFile.writeToSD("QD_USER",sb1.toString());
 
 
         StringBuilder sb2=new StringBuilder();
-        sb2.append("CONS_NO;variance\n");
+        sb2.append("CONS_NO;variance;sum\n");
         System.out.println("每个不确定的用户的数据：");
         for (String s:NOT_SURE_USER.keySet())
         {
             ArrayList<String> list=NOT_SURE_USER.get(s);
             double variance=statistics.countVariance(list);
-            //System.out.println("不确定的用户："+s +"\t用电记录数："+list.size()+"\t方差："+variance);
-            sb2.append(s+";"+variance+"\n");
-        }
+            double sum=statistics.countSum(list);
 
+            //System.out.println("不确定的用户："+s +"\t用电记录数："+list.size()+"\t方差："+variance);
+            sb2.append(s+";"+variance+";"+sum+"\n");
+        }
         WriteToFile.writeToSD("NOT_SURE_USER",sb2.toString());
 
 
@@ -134,6 +135,11 @@ public class Statistics {
 
     }
 
+    /**
+     * 计算方差
+     * @param list
+     * @return
+     */
     private double countVariance(List<String> list)
     {
         double[] values=new double[list.size()];
@@ -144,6 +150,21 @@ public class Statistics {
         }
 
         return Deviation.ComputeVariance2(values);
+    }
+
+    /**
+     * 计算和
+     * @param list
+     * @return
+     */
+    private double countSum(List<String> list)
+    {
+        double sum=0;
+        for (String s:list)
+        {
+            sum+= Double.valueOf(s);
+        }
+        return sum;
     }
 
 }
