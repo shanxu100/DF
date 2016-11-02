@@ -17,7 +17,7 @@ public class WriteToFile {
      *把数据写入文件
      *
      */
-    public static void writeToSD(String fileName, String s) {
+    public static void writeToSD(String fileName, String s,boolean isAppend) {
         try {
             //String pathName = Environment.getExternalStorageDirectory().getPath() + "/BetterUse/webview";
             String pathName= Statistics.DIR;
@@ -32,7 +32,7 @@ public class WriteToFile {
             }
 
 
-            FileOutputStream stream = new FileOutputStream(file, false);
+            FileOutputStream stream = new FileOutputStream(file, isAppend);
             Writer out = new OutputStreamWriter(stream, "UTF-8");
             //byte[] buf = s.getBytes();
             //stream.write(buf);
