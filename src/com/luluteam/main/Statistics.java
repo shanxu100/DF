@@ -131,7 +131,8 @@ public class Statistics {
         NOT_SURE_AllUsers = new AllUsers(NOT_SURE_COUNT);
         classifyTrain2(ALL_USER_YONGDIAN_DATA_LIST);
 
-        QD_AllUsers.toPrint();
+        QD_AllUsers.toPrint("QD_AsMonth");
+        NOT_SURE_AllUsers.toPrint("NOT_SURE_AsMonth");
 
     }
 

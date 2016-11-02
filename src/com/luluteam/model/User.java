@@ -66,7 +66,13 @@ public class User {
         if (periods.containsKey(periodid)) {
             periods.get(periodid).add(periodid, max, min);
         } else {
-            periods.put(periodid, new Period(periodid, max, min));
+            if (max != Double.MIN_VALUE) {
+                if (min == Double.MAX_VALUE) {
+                    min = max;
+                }
+                periods.put(periodid, new Period(periodid, max, min));
+            }
+
         }
     }
 
@@ -78,10 +84,13 @@ public class User {
         double max;
         double min;
 
+        private int count=0;
+
         public Period(String id, double max, double min) {
             this.id = id;
             this.max = max;
             this.min = min;
+            count=0;
         }
 
         public void add(String id, double max, double min) {
@@ -92,6 +101,8 @@ public class User {
             this.max = max > this.max ? max : this.max;
 
             this.min = min < this.min ? min : this.min;
+
+            count++;
 
         }
 

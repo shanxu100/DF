@@ -24,7 +24,7 @@ public class AllUsers {
     }
 
 
-    public void toPrint() {
+    public void toPrint(String filename) {
         StringBuilder sb;
         for (String s : map.keySet()) {
 //            System.out.println("用户："+s+"每个周期的数据：");
@@ -41,7 +41,7 @@ public class AllUsers {
             }
             System.out.println();
             sb.append("\n");
-            WriteToFile.writeToSD("statisticAsMonth",sb.toString(),true);
+            WriteToFile.writeToSD(filename,sb.toString(),true);
         }
     }
 
