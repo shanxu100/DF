@@ -65,7 +65,7 @@ public class User {
             record[4] = record[5];
         }
         if (!record[4].equals("") && record[5].equals("")) {//缺失上次读数，此处补全了
-            record[5] = MAX_STRING;
+            record[5] = record[4];
         }
 
         max = Double.valueOf(record[4]);

@@ -12,11 +12,13 @@ import java.util.*;
  */
 public class Statistics {
 
-    public static String DIR = "/home/guan/documents/lesson/";
-    private static String ALL_USER_YONGDIAN_DATA_FILE = DIR + "all_user_yongdian_data_2015";
-    private static String ALL_USER_YONGDIAN_DATA_FILE_NEW = DIR + "all_user_yongdian_data_2015_new";
+    //    public static String DIR = "/home/guan/documents/lesson/";
+    public static String DIR = "/Users/lianglitu/Documents/lesson";
 
-    private static String user8639948250_FILE=DIR+"8639948250user";
+    private static String ALL_USER_YONGDIAN_DATA_FILE = DIR + "all_user_yongdian_data_2015";
+    private static String ALL_USER_YONGDIAN_DATA_FILE_NEW = DIR + "5143816341user";
+
+    private static String user8639948250_FILE = DIR + "8639948250user";
 
     private static String TEST_FILE = DIR + "test";
     private static String TRAIN_FILE = DIR + "train";
@@ -161,7 +163,7 @@ public class Statistics {
             double sum = countSum(list);
             sb1.append(s + ";" + variance + ";" + sum + "\n");
         }
-        WriteToFile.writeToFile("QD_USER", sb1.toString(),false);
+        WriteToFile.writeToFile("QD_USER", sb1.toString(), false);
 
 
         StringBuilder sb2 = new StringBuilder();
@@ -173,7 +175,7 @@ public class Statistics {
             double sum = countSum(list);
             sb2.append(s + ";" + variance + ";" + sum + "\n");
         }
-        WriteToFile.writeToFile("NOT_SURE_USER", sb2.toString(),false);
+        WriteToFile.writeToFile("NOT_SURE_USER", sb2.toString(), false);
     }
 
     /**
@@ -206,11 +208,9 @@ public class Statistics {
         return sum;
     }
 
-    private void recordTest(String[] record)
-    {
-        if (record[4].equals("")&&!record[5].equals(""))
-        {
-            System.out.println("只有上次读数，没有本次读数："+ record[0]+"\t"+record[2]+"\t"+record[3]);
+    private void recordTest(String[] record) {
+        if (record[4].equals("") && !record[5].equals("")) {
+            System.out.println("只有上次读数，没有本次读数：" + record[0] + "\t" + record[2] + "\t" + record[3]);
         }
     }
 
