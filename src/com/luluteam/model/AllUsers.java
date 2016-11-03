@@ -31,7 +31,7 @@ public class AllUsers {
 //            System.out.println("用户："+s+"每个周期的数据：");
             WriteToFile.writeToFile(filename, map.get(s).printPeriod(), true);
 
-            System.out.println("用户"+s+"记录数:"+map.get(s).getRecordcount());
+            //System.out.println("用户"+s+"记录数:"+map.get(s).getRecordcount());
         }
         System.out.println("数据写入成功");
     }
