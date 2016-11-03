@@ -12,13 +12,13 @@ import java.util.*;
  */
 public class Statistics {
 
-    public static String DIR = "/home/guan/documents/lesson/";
-//    public static String DIR = "/Users/lianglitu/Documents/lesson";
+    //public static String DIR = "/home/guan/documents/lesson/";
+    public static String DIR = "/Users/lianglitu/Documents/lesson/";
 
     private static String ALL_USER_YONGDIAN_DATA_FILE = DIR + "all_user_yongdian_data_2015";
     private static String ALL_USER_YONGDIAN_DATA_FILE_NEW = DIR + "all_user_yongdian_data_2015_new";
 
-    private static String user8639948250_FILE = DIR + "8639948250user";
+    private static String user_FILE = DIR + "5185010033user";
 
     private static String TEST_FILE = DIR + "test";
     private static String TRAIN_FILE = DIR + "train";
@@ -47,7 +47,7 @@ public class Statistics {
         Statistics statistics = new Statistics();
 
 
-        ALL_USER_YONGDIAN_DATA_LIST = ReadFromFile.readFileByLines(ALL_USER_YONGDIAN_DATA_FILE_NEW);
+        ALL_USER_YONGDIAN_DATA_LIST = ReadFromFile.readFileByLines(user_FILE);
 
         TRAIN_LIST = ReadFromFile.readFileByLines(TRAIN_FILE);
         statistics.from_List_to_Map(TRAIN_LIST);

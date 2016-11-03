@@ -95,7 +95,7 @@ public class User {
 
                 if (value<0.0)
                 {
-                    System.out.println("有负数：id"+id+"\tmonth:"+i);
+                    System.out.println("有负数 id: "+id+"\tmonth:"+i);
                 }
 
             } else {
