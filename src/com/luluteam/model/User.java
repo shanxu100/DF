@@ -57,7 +57,7 @@ public class User {
         double min;
 
         if (record[4].equals("") && record[5].equals("")) {
-            System.out.println("本次读数和上次读书均没有，舍弃记录。" + record[0] + "\t" + record[2] + "\t" + record[3]);
+            //System.out.println("本次读数和上次读书均没有，舍弃记录。" + record[0] + "\t" + record[2] + "\t" + record[3]);
             return;
         }
 
