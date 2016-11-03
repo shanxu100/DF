@@ -12,8 +12,8 @@ import java.util.*;
  */
 public class Statistics {
 
-    //    public static String DIR = "/home/guan/documents/lesson/";
-    public static String DIR = "/Users/lianglitu/Documents/lesson";
+    public static String DIR = "/home/guan/documents/lesson/";
+//    public static String DIR = "/Users/lianglitu/Documents/lesson";
 
     private static String ALL_USER_YONGDIAN_DATA_FILE = DIR + "all_user_yongdian_data_2015";
     private static String ALL_USER_YONGDIAN_DATA_FILE_NEW = DIR + "5143816341user";
