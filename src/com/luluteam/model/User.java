@@ -92,6 +92,12 @@ public class User {
 
                 value = periods.get(Integer.toString(i)).getPeriodValue();
                 sb.append(df.format(value) + ",");//保留两位小数
+
+                if (value<0.0)
+                {
+                    System.out.println("有负数：id"+id+"\tmonth:"+i);
+                }
+
             } else {
                 sb.append(",");
             }
