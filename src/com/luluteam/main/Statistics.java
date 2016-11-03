@@ -1,7 +1,6 @@
 package com.luluteam.main;
 
 import com.luluteam.model.AllUsers;
-import com.luluteam.model.User;
 import com.luluteam.utils.Deviation;
 import com.luluteam.utils.ReadFromFile;
 import com.luluteam.utils.WriteToFile;
@@ -16,6 +15,9 @@ public class Statistics {
     public static String DIR = "/home/guan/documents/lesson/";
     private static String ALL_USER_YONGDIAN_DATA_FILE = DIR + "all_user_yongdian_data_2015";
     private static String ALL_USER_YONGDIAN_DATA_FILE_NEW = DIR + "all_user_yongdian_data_2015_new";
+
+    private static String user8639948250_FILE=DIR+"8639948250user";
+
     private static String TEST_FILE = DIR + "test";
     private static String TRAIN_FILE = DIR + "train";
     private static List<String> ALL_USER_YONGDIAN_DATA_LIST = new ArrayList<>();
@@ -44,6 +46,7 @@ public class Statistics {
 
 
         ALL_USER_YONGDIAN_DATA_LIST = ReadFromFile.readFileByLines(ALL_USER_YONGDIAN_DATA_FILE_NEW);
+
         TRAIN_LIST = ReadFromFile.readFileByLines(TRAIN_FILE);
         statistics.from_List_to_Map(TRAIN_LIST);
 
@@ -108,6 +111,9 @@ public class Statistics {
         for (String s : list) {
             tmp = s.split(",", 7);
 
+            //recordTest(tmp);
+
+
             if (QD_USER.containsKey(tmp[0]))//如果这个用户是“窃电用户”
             {
                 QD_AllUsers.addUser(tmp);
@@ -155,7 +161,7 @@ public class Statistics {
             double sum = countSum(list);
             sb1.append(s + ";" + variance + ";" + sum + "\n");
         }
-        WriteToFile.writeToSD("QD_USER", sb1.toString(),false);
+        WriteToFile.writeToFile("QD_USER", sb1.toString(),false);
 
 
         StringBuilder sb2 = new StringBuilder();
@@ -167,7 +173,7 @@ public class Statistics {
             double sum = countSum(list);
             sb2.append(s + ";" + variance + ";" + sum + "\n");
         }
-        WriteToFile.writeToSD("NOT_SURE_USER", sb2.toString(),false);
+        WriteToFile.writeToFile("NOT_SURE_USER", sb2.toString(),false);
     }
 
     /**
@@ -198,6 +204,14 @@ public class Statistics {
             sum += Double.valueOf(s);
         }
         return sum;
+    }
+
+    private void recordTest(String[] record)
+    {
+        if (record[4].equals("")&&!record[5].equals(""))
+        {
+            System.out.println("只有上次读数，没有本次读数："+ record[0]+"\t"+record[2]+"\t"+record[3]);
+        }
     }
 
 }

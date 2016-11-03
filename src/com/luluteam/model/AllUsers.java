@@ -16,6 +16,7 @@ public class AllUsers {
     }
 
     public void addUser(String[] record) {
+
         if (map.containsKey(record[0])) {
             map.get(record[0]).addRecord(record);
         } else {
@@ -25,24 +26,14 @@ public class AllUsers {
 
 
     public void toPrint(String filename) {
-        StringBuilder sb;
+
         for (String s : map.keySet()) {
 //            System.out.println("用户："+s+"每个周期的数据：");
-            sb=new StringBuilder();
-            sb.append(s+":");
-            Map<String, User.Period> periods = map.get(s).getPeriods();
+            WriteToFile.writeToFile(filename, map.get(s).printPeriod(), true);
 
-            for (int i = 1; i <= 12; i++) {
-                if (periods.containsKey(Integer.toString(i))) {
-                    sb.append(periods.get(Integer.toString(i)).getPeriodValue() + ":");
-                } else {
-                    sb.append(":");
-                }
-            }
-            System.out.println();
-            sb.append("\n");
-            WriteToFile.writeToSD(filename,sb.toString(),true);
+            System.out.println("用户"+s+"记录数:"+map.get(s).getRecordcount());
         }
+        System.out.println("数据写入成功");
     }
 
 }
