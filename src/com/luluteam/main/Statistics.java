@@ -22,6 +22,7 @@ public class Statistics {
     private static String TRAIN_FILE = DIR + "train";
     private static List<String> ALL_USER_YONGDIAN_DATA_LIST = new ArrayList<>();
     private static List<String> TRAIN_LIST = new ArrayList<>();
+    private static List<String> TEST_LIST = new ArrayList<>();
 
 
     //确定窃电用户的数据
@@ -35,6 +36,10 @@ public class Statistics {
     private Map<String, ArrayList<String>> NOT_SURE_USER = new HashMap<>();//<用户，用电量>
     private AllUsers NOT_SURE_AllUsers;
 
+    //测试集
+    int TEST_COUNT = 0;
+    private Set<String> TEST_USER = new HashSet<>();//<用户，用电量>
+    private AllUsers TEST_AllUsers;
 
     //flag
     private static String QD_FLAG = "1";
@@ -48,10 +53,15 @@ public class Statistics {
         ALL_USER_YONGDIAN_DATA_LIST = ReadFromFile.readFileByLines(ALL_USER_YONGDIAN_DATA_FILE_NEW);
 
         TRAIN_LIST = ReadFromFile.readFileByLines(TRAIN_FILE);
+        TEST_LIST=ReadFromFile.readFileByLines(TEST_FILE);
         statistics.from_List_to_Map(TRAIN_LIST);
+        statistics.from_List_to_Set(TEST_LIST);
 
         //按月统计训练集中的每个人的月用电量
-        statistics.statisticAsMonth();
+        //statistics.statisticAsMonth();
+
+        //按月统计测试集中的每个人的月用电量
+        statistics.statisticAsMonth_fortest();
 
 
     }
@@ -78,6 +88,16 @@ public class Statistics {
         }
 
     }
+
+    private void from_List_to_Set(List<String> list) {
+        String[] tmp;
+        for (String s: list)
+        {
+            tmp = s.split(",");
+            TEST_USER.add(tmp[0]);
+        }
+    }
+
 
 
 
@@ -106,6 +126,25 @@ public class Statistics {
     }
 
     /**
+     * 从数据集中剥离test集中的用户
+     * @param list
+     */
+    private void classifyTest(List<String> list)
+    {
+        String[] tmp;
+
+        for (String s : list) {
+            tmp = s.split(",", 7);
+
+            if (TEST_USER.contains(tmp[0]))
+            {
+                TEST_AllUsers.addUser(tmp);
+            }
+        }
+
+    }
+
+    /**
      * 按月统计训练集中的每个人的月用电量
      */
     public void statisticAsMonth() {
@@ -115,6 +154,20 @@ public class Statistics {
 
         QD_AllUsers.toPrint("QD_AsMonth");
         NOT_SURE_AllUsers.toPrint("NOT_SURE_AsMonth");
+
+
+    }
+
+    /**
+     * 按月统计测试集中的每个人的月用电量
+     */
+    public void statisticAsMonth_fortest() {
+        TEST_AllUsers =new AllUsers(TEST_COUNT);
+        classifyTest(ALL_USER_YONGDIAN_DATA_LIST);
+
+        TEST_AllUsers.toPrint("TEST_AsMonth");
+
+
 
     }
 
