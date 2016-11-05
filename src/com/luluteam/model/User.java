@@ -1,7 +1,11 @@
 package com.luluteam.model;
 
+import com.luluteam.utils.Deviation;
+
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -56,7 +60,8 @@ public class User {
         String periodid = record[2];
         double now_num;
         double last_num;
-        double sum;
+        double sumOfDay;
+        boolean isModified = false;
 
         if (record[4].equals("") && record[5].equals("")) {
             //System.out.println("本次读数和上次读书均没有，舍弃记录。" + record[0] + "\t" + record[2] + "\t" + record[3]);
@@ -66,10 +71,12 @@ public class User {
         if (record[4].equals("") && !record[5].equals("")) {//缺失本次读数，此处补全了
             record[4] = record[5];
             record[6] = "0";
+            isModified = true;
         }
         if (!record[4].equals("") && record[5].equals("")) {//缺失上次读数，此处补全了
             record[5] = record[4];
             record[6] = "0";
+            isModified = true;
         }
 
         now_num = Double.valueOf(record[4]);
@@ -80,12 +87,12 @@ public class User {
         }
 
 
-        sum = Double.valueOf(record[6]);
+        sumOfDay = Double.valueOf(record[6]);
 
         if (periods.containsKey(periodid)) {
-            periods.get(periodid).add(periodid, now_num, last_num, sum);
+            periods.get(periodid).add(periodid, now_num, last_num, sumOfDay, isModified);
         } else {
-            periods.put(periodid, new Period(periodid, now_num, last_num));
+            periods.put(periodid, new Period(periodid, now_num, last_num, sumOfDay, isModified));
         }
     }
 
@@ -94,16 +101,25 @@ public class User {
 
         StringBuilder sb = new StringBuilder();
         DecimalFormat df = new DecimalFormat("#0.00");
-        double value;
+        double sumOfPeriod;
+        double avgOfPeriod;
+        double devOfPeriod;
+
+        Period period;
 
         sb.append(id + ",");
         for (int i = 1; i <= 12; i++) {
             if (periods.containsKey(Integer.toString(i))) {
 
-                value = periods.get(Integer.toString(i)).getPeriodValue();
-                sb.append(df.format(value) + ",");//保留两位小数
+                period = periods.get(Integer.toString(i));
+                sumOfPeriod = period.getValueAsSum();
+                avgOfPeriod = period.getValueAsAvg();
+                devOfPeriod = period.getValueAsDeviation();
+                sb.append(df.format(sumOfPeriod) + ",");//保留两位小数
+                sb.append(df.format(avgOfPeriod) + ",");//保留两位小数
+                sb.append(df.format(devOfPeriod) + ",");//保留两位小数
 
-                if (value < 0.0) {
+                if (sumOfPeriod < 0.0) {
                     System.out.println("有负数 id: " + id + "\tmonth:" + i);
                 }
 
@@ -129,7 +145,7 @@ public class User {
                     String i_periodid = Integer.toString(i);
                     double i_start = periods.get(Integer.toString(i - 1)).start;
                     double i_end = periods.get(Integer.toString(i + 1)).end;
-                    periods.put(i_periodid, new Period(i_periodid, i_end, i_start));
+                    periods.put(i_periodid, new Period(i_periodid, i_end, i_start, 0, true));
                 }
                 i++;
             }
@@ -146,23 +162,31 @@ public class User {
         double start;
         double end;
 
-        double sumAsPeriod;
+        double sumOfPeriod;
 
-        private int count = 0;
+        private int count;
+        private int unmodifiedCount;
 
-        public Period(String id, double now_num, double last_num) {
+        private List<Double> unmodifiedSumOfDay;
+
+        public Period(String id, double now_num, double last_num, double sumOfDay, boolean isModified) {
             this.id = id;
             this.max = now_num;
             this.min = last_num;
 
             this.start = last_num;
 
-            sumAsPeriod = 0;
+            sumOfPeriod = 0;
 
             count = 0;
+            unmodifiedCount = 0;
+            unmodifiedSumOfDay = new ArrayList<>();
+
+            add(id, now_num, last_num, sumOfDay, isModified);
+
         }
 
-        public void add(String id, double now_num, double last_num, double sum) {
+        public void add(String id, double now_num, double last_num, double sumOfDay, boolean isModified) {
             if (!this.id.equals(id)) {
                 System.out.println("记录与周期集合不符，插入失败：" + id + "\t" + now_num + "\t" + last_num);
                 return;
@@ -173,20 +197,45 @@ public class User {
 
             this.end = now_num;//记录末尾读数
 
-            sumAsPeriod += sum;//以第二种方式记录总用电量
+            sumOfPeriod += sumOfDay;//以第二种方式记录总用电量
 
             count++;
 
+            if (!isModified) {
+                unmodifiedSumOfDay.add(sumOfDay);
+                unmodifiedCount++;
+            }
+
         }
 
-        public double getPeriodValue() {
-           double value;
-            if ((value=max-min)>0)
-            {
+        public double getValueAsSum() {
+            double value;
+            if ((value = max - min) > 0) {
                 return value;
-            }else {
-                return sumAsPeriod;
+            } else {
+                return sumOfPeriod;
             }
+        }
+
+        public double getValueAsAvg() {
+            if(unmodifiedCount==0)
+            {
+                return 0;
+            }
+            double sum = 0;
+            for (Double d : unmodifiedSumOfDay) {
+                sum += d;
+            }
+            return sum / unmodifiedCount;
+        }
+
+        public double getValueAsDeviation() {
+
+            if(unmodifiedCount==0)
+            {
+                return 0;
+            }
+            return Deviation.ComputeVariance2(unmodifiedSumOfDay.toArray());
         }
 
     }

@@ -1,5 +1,7 @@
 package com.luluteam.utils;
 
+import java.util.Objects;
+
 /**
  * Created by guan on 11/1/16.
  */
@@ -43,11 +45,21 @@ public class Deviation {
         variance = sum2 / len - (sum / len) * (sum / len);
         return variance;
     }
-//
-//    public static void main(String args[]) {
-//        double a[] = {1, 2, 3, 4, 5};
-//        System.out.println(ComputeVariance(a));
-//        System.out.println(ComputeVariance2(a));
-//
-//    }
+
+    /**
+     * 只遍历数组一次求方差，利用公式DX^2=EX^2-(EX)^2
+     *
+     * @param a
+     * @return
+     */
+    public static double ComputeVariance2(Object a[]) {
+        double[] b = new double[a.length];
+        for (int i = 0; i < a.length; i++) {
+            b[i] = (double) a[i];
+        }
+
+        return ComputeVariance2(b);
+
+
+    }
 }
