@@ -43,6 +43,7 @@ public class User {
     }
 
     /**
+     * 重点
      * 为用户添加用电记录
      * 在此处做一些统计
      *
@@ -53,8 +54,9 @@ public class User {
         recordcount++;
 
         String periodid = record[2];
-        double max;
-        double min;
+        double now_num;
+        double last_num;
+        double sum;
 
         if (record[4].equals("") && record[5].equals("")) {
             //System.out.println("本次读数和上次读书均没有，舍弃记录。" + record[0] + "\t" + record[2] + "\t" + record[3]);
@@ -63,19 +65,27 @@ public class User {
 
         if (record[4].equals("") && !record[5].equals("")) {//缺失本次读数，此处补全了
             record[4] = record[5];
+            record[6] = "0";
         }
         if (!record[4].equals("") && record[5].equals("")) {//缺失上次读数，此处补全了
             record[5] = record[4];
+            record[6] = "0";
         }
 
-        max = Double.valueOf(record[4]);
-        min = Double.valueOf(record[5]);
+        now_num = Double.valueOf(record[4]);
+        last_num = Double.valueOf(record[5]);
 
+        if (record[6].equals("")) {
+            record[6] = Double.toString(now_num - last_num);
+        }
+
+
+        sum = Double.valueOf(record[6]);
 
         if (periods.containsKey(periodid)) {
-            periods.get(periodid).add(periodid, max, min);
+            periods.get(periodid).add(periodid, now_num, last_num, sum);
         } else {
-            periods.put(periodid, new Period(periodid, max, min));
+            periods.put(periodid, new Period(periodid, now_num, last_num));
         }
     }
 
@@ -83,7 +93,7 @@ public class User {
         complementPeriod();
 
         StringBuilder sb = new StringBuilder();
-        DecimalFormat df = new DecimalFormat("#.00");
+        DecimalFormat df = new DecimalFormat("#0.00");
         double value;
 
         sb.append(id + ",");
@@ -93,9 +103,8 @@ public class User {
                 value = periods.get(Integer.toString(i)).getPeriodValue();
                 sb.append(df.format(value) + ",");//保留两位小数
 
-                if (value<0.0)
-                {
-                    System.out.println("有负数 id: "+id+"\tmonth:"+i);
+                if (value < 0.0) {
+                    System.out.println("有负数 id: " + id + "\tmonth:" + i);
                 }
 
             } else {
@@ -118,9 +127,9 @@ public class User {
 
                 if (periods.containsKey(Integer.toString(i - 1)) && periods.containsKey(Integer.toString(i + 1))) {
                     String i_periodid = Integer.toString(i);
-                    double i_min = periods.get(Integer.toString(i - 1)).max;
-                    double i_max = periods.get(Integer.toString(i + 1)).min;
-                    periods.put(i_periodid, new Period(i_periodid, i_max, i_min));
+                    double i_start = periods.get(Integer.toString(i - 1)).start;
+                    double i_end = periods.get(Integer.toString(i + 1)).end;
+                    periods.put(i_periodid, new Period(i_periodid, i_end, i_start));
                 }
                 i++;
             }
@@ -134,32 +143,50 @@ public class User {
         String id;
         double max;
         double min;
+        double start;
+        double end;
+
+        double sumAsPeriod;
 
         private int count = 0;
 
-        public Period(String id, double max, double min) {
+        public Period(String id, double now_num, double last_num) {
             this.id = id;
-            this.max = max;
-            this.min = min;
+            this.max = now_num;
+            this.min = last_num;
+
+            this.start = last_num;
+
+            sumAsPeriod = 0;
+
             count = 0;
         }
 
-        public void add(String id, double max, double min) {
+        public void add(String id, double now_num, double last_num, double sum) {
             if (!this.id.equals(id)) {
-                System.out.println("记录与周期集合不符，插入失败：" + id + "\t" + max + "\t" + min);
+                System.out.println("记录与周期集合不符，插入失败：" + id + "\t" + now_num + "\t" + last_num);
                 return;
             }
 
-            this.max = max > this.max ? max : this.max;
+            this.max = now_num > this.max ? now_num : this.max;
+            this.min = last_num < this.min ? last_num : this.min;
 
-            this.min = min < this.min ? min : this.min;
+            this.end = now_num;//记录末尾读数
+
+            sumAsPeriod += sum;//以第二种方式记录总用电量
 
             count++;
 
         }
 
         public double getPeriodValue() {
-            return max - min;
+           double value;
+            if ((value=max-min)>0)
+            {
+                return value;
+            }else {
+                return sumAsPeriod;
+            }
         }
 
     }

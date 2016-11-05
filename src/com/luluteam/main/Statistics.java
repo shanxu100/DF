@@ -6,19 +6,20 @@ import com.luluteam.utils.ReadFromFile;
 import com.luluteam.utils.WriteToFile;
 
 import java.util.*;
+import java.util.concurrent.ExecutionException;
 
 /**
  * Created by guan on 11/1/16.
  */
 public class Statistics {
 
-    //public static String DIR = "/home/guan/documents/lesson/";
-    public static String DIR = "/Users/lianglitu/Documents/lesson/";
+    public static String DIR = "/home/guan/documents/lesson/";
+//    public static String DIR = "/Users/lianglitu/Documents/lesson/";
 
     private static String ALL_USER_YONGDIAN_DATA_FILE = DIR + "all_user_yongdian_data_2015";
     private static String ALL_USER_YONGDIAN_DATA_FILE_NEW = DIR + "all_user_yongdian_data_2015_new";
 
-    private static String user_FILE = DIR + "5185010033user";
+    private static String user_FILE = DIR + "9683587354user";
 
     private static String TEST_FILE = DIR + "test";
     private static String TRAIN_FILE = DIR + "train";
@@ -47,7 +48,7 @@ public class Statistics {
         Statistics statistics = new Statistics();
 
 
-        ALL_USER_YONGDIAN_DATA_LIST = ReadFromFile.readFileByLines(user_FILE);
+        ALL_USER_YONGDIAN_DATA_LIST = ReadFromFile.readFileByLines(ALL_USER_YONGDIAN_DATA_FILE_NEW);
 
         TRAIN_LIST = ReadFromFile.readFileByLines(TRAIN_FILE);
         statistics.from_List_to_Map(TRAIN_LIST);
@@ -209,9 +210,26 @@ public class Statistics {
     }
 
     private void recordTest(String[] record) {
-        if (record[4].equals("") && !record[5].equals("")) {
-            System.out.println("只有上次读数，没有本次读数：" + record[0] + "\t" + record[2] + "\t" + record[3]);
+//        if (record[4].equals("") && !record[5].equals("")) {
+//            System.out.println("只有上次读数，没有本次读数：" + record[0] + "\t" + record[2] + "\t" + record[3]);
+//        }
+//
+        try {
+//            if (!record[4].equals("")&&!record[5].equals("")&&record[6].equals(""))
+//            {
+//                System.out.println("只有读数，没有日用电量："+record[0] + "\t" + record[2] + "\t" + record[3]);
+//            }
+            if (record[4].equals("")&&record[5].equals("")&&!record[6].equals(""))
+            {
+                System.out.println("只有日用电量,没有读数："+record[0] + "\t" + record[2] + "\t" + record[3]);
+            }
+
+        }catch (Exception e)
+        {
+            System.out.println("异常"+record[0]+"\t"+record[2]+"\t"+record[3]);
+            e.printStackTrace();
         }
+
     }
 
 }
