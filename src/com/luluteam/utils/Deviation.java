@@ -8,7 +8,6 @@ import java.util.Objects;
 public class Deviation {
     /**
      * 传统的利用平均数求方差的方法,需要遍历数组两次
-     *
      * @param a 目标数组
      * @return 方差
      */
@@ -57,9 +56,8 @@ public class Deviation {
         for (int i = 0; i < a.length; i++) {
             b[i] = (double) a[i];
         }
-
         return ComputeVariance2(b);
-
-
     }
+
+
 }
